@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
 import { usePokemonStore } from "../stores/pokemon";
 import { RouterLink } from "vue-router";
 const store = usePokemonStore();

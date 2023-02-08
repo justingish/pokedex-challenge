@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
 import { usePokemonStore } from "../stores/pokemon";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 const store = usePokemonStore();
@@ -20,9 +20,9 @@ if (typeof pokemon === "undefined") {
       <h1>Details</h1>
       <img :src="pokemon?.sprites.front_default" />
       <p>{{ pokemon?.name }}</p>
-      <!-- 
-        TODO: What other things could I show here? 
-        I really wish there was a TS interface to help me 
+      <!--
+        TODO: What other things could I show here?
+        I really wish there was a TS interface to help me
       -->
     </div>
   </section>
