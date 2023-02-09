@@ -1,10 +1,11 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
+import type { NameAndURL, PokemonDetails } from "../types";
 
 const baseUrl = "https://pokeapi.co/api/v2";
 const TOTAL_POKEMON = 1008;
 export const usePokemonStore = defineStore("pokemon", () => {
-  const fullList = ref([]);
+  const fullList = ref<PokemonDetails[]>([]);
 
   function getRandomInt(max) {
     return Math.floor(Math.random() * max);
@@ -18,19 +19,26 @@ export const usePokemonStore = defineStore("pokemon", () => {
     const response = await fetch(
       `${baseUrl}/pokemon-species?limit=${limit}&offset=${offset}`
     );
-    const list = (await response.json()).results;
+    const list: NameAndURL[] = (await response.json()).results;
 
-    const promises = [];
-    list.map((pokemon) => {
+    const promises: Promise<PokemonDetails | null>[] = [];
+    list.map((pokemon: NameAndURL): void => {
       const url = `${baseUrl}/pokemon/${pokemon.name}`;
-      promises.push(
-        fetch(url)
-          .then((res) => res.json())
-          .catch((e) => console.log(e))
-      );
+      const pokemonPromise = fetch(url)
+        .then((res: Response): Promise<PokemonDetails> => res.json())
+        .catch((e: Error): null => {
+          console.log(e);
+          return null;
+        });
+      if (pokemonPromise) promises.push(pokemonPromise);
+    });
+    const resolvedPromises = await Promise.all(promises);
+    const pokemon: PokemonDetails[] = [];
+    resolvedPromises.forEach((poke) => {
+      if (poke) pokemon.push(poke);
     });
 
-    fullList.value = await Promise.all(promises);
+    fullList.value = pokemon;
   }
 
   return { fullList, fetchAll };
